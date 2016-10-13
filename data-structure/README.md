@@ -3,7 +3,7 @@
 *Ideally, this will be in its own separate repo under COALA with a better name. Make sure to fix
 links when moving repos.*
 
-The definitive [JSON-LD](http://json-ld.org/) and [IPLD](https://github.com/ipld/specs/tree/master/ipld)
+The reference [JSON-LD](http://json-ld.org/) and [IPLD](https://github.com/ipld/specs/tree/master/ipld)
 entity schemata (and their Linked Data contexts) for [COALA IP](https://github.com/ascribe/specs/tree/master/coala-ip).
 
 Includes:
@@ -31,7 +31,7 @@ Includes:
 ## Overview
 
 An overview and explaination of each representation can be found in the [COALA IP Specification,
-under the section "Remodeling the LCC RRM with Linked Data"](https://github.com/ascribe/specs/tree/master/coala-ip#coala-ip-remodeling-the-lcc-rrm-with-linked-data).
+under the section "Implementing the LCC RRM with Linked Data"](https://github.com/ascribe/specs/tree/master/coala-ip#coala-ip-implementing-the-lcc-rrm-with-linked-data).
 
 ### Vocabularies
 
