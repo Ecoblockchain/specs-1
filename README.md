@@ -1158,31 +1158,57 @@ of individuals. Using the minimum number of properties listed in the RRM, an `lc
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://schema.org/Organization",
-    "@id": "http://identityservice.com/organizations/w3c",
+    "@context": "http://coalaip.schema/",
+    "@type": "Organization",
+    "@id": "<URI pointing to this object>",
     "name": "World Wide Web Consortium",
     "founder": {
-        "@type": "http://linkedcontentcoalition.com/Identity",
-        "@id": "https://identityservice.com/identities/12bS2BTF4j8kkmNqoyQRwzKy76EXQWRVWJ",
+        "@type": Identity",
+        "@id": "<URI pointing to the founder Party>"
     },
     "member": [
         {
-            "@type": "http://linkedcontentcoalition.com/Identity",
-            "@id": "https://identityservice.com/identities/152xhUAJBGEht9Jwerv1omFV82xaRcyzHH",
+            "@type": "Identity",
+            "@id": "<URI pointing to a member Party"
         },
         {
-            "@type": "http://linkedcontentcoalition.com/Identity",
-            "@id": "https://identityservice.com/identities/1Je5tHHkHcs1ioLZmiBFSuyiXdwd76xf4D",
+            "@type": "Identity",
+            "@id": "<URI pointing to a member Party"
         },
         {
-            "@type": "http://linkedcontentcoalition.com/Identity",
-            "@id": "https://identityservice.com/identities/1QDtDjNgBx6242VakTTkFMn5HmkibzrsR8",
+            "@type": "Identity",
+            "@id": "<URI pointing to a member Party"
+        }
+    ]
+}
+
+// In IPLD
+{
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Organization",
+    "@id": "",
+    "name": "World Wide Web Consortium",
+    "founder": {
+        "@type": "Identity",
+        "@id": { "/": "<hash pointing to the founder Party" }
+    },
+    "member": [
+        {
+            "@type": "Identity",
+            "@id": { "/": "<hash pointing to a member Party" }
+        },
+        {
+            "@type": "Identity",
+            "@id": { "/": "<hash pointing to a member Party" }
+        },
+        {
+            "@type": "Identity",
+            "@id": { "/": "<hash pointing to a member Party" }
         }
     ]
 }
 ```
 
-- TODO: Also define how the object would look like in IPLD.
 - TODO: This needs a lot of speccing out. How can members of an organization collectively sign
   something they're submitting? Is there a single public key address assigned to an organization or
 does the organization just bundle members that act like they were in an organization but act
