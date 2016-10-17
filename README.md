@@ -853,6 +853,10 @@ Our approach to implementing the RRM is as follows:
 1. Modify the chosen schemata's semantics for use on a distributed ledger, if necessary.
 
 
+For the purposes of demonstration, we put any new schemata into `http://coalaip.schema/` and assume
+that this document also contains all schema.org definitions (so we don't have to provide
+`http://schema.org/` as an additional context).
+
 A slight speed bump in the schematization process comes when we try to maintain support for generic
 links between entities. The RRM defines the existence of links in a generic, one-to-many (i.e. `0 -
 n`) manner. However, RDF and Linked Data require these links to be explicitly named so as to express
@@ -903,9 +907,10 @@ adapted from schema.org):
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://schema.org/Place",
+    "@context": "http://schema.org/",
+    "@type": "Place",
     "geo": {
-        "@type": "http://schema.org/GeoCoordinates",
+        "@type": "GeoCoordinates",
         "latitude": "40.75",
         "longitude": "73.98"
     },
@@ -914,9 +919,10 @@ adapted from schema.org):
 
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Place>" },
+    "@context": { "/": "<hash pointing to schema.org's context>" },
+    "@type": "Place",
     "geo": {
-        "@type": { "/": "<hash pointing to RDF-Schema of GeoCoordinates>" },
+        "@type": "GeoCoordinates",
         "latitude": "40.75",
         "longitude": "73.98"
     },
@@ -1013,7 +1019,8 @@ properties directly on our model. This gets us:
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://schema.org/Person",
+    "@context": "http://schema.org/",
+    "@type": "Person",
     "@id": "https://en.wikipedia.org/wiki/Andy_Warhol",
     "birthDate": "1928-08-06",
     "deathDate": "1987-02-22"
@@ -1021,7 +1028,8 @@ properties directly on our model. This gets us:
 
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Person>" },
+    "@context": { "/": "<hash pointing to schema.org's context>" },
+    "@type": "Person",
     "@id": "https://en.wikipedia.org/wiki/Andy_Warhol",
     "birthDate": "1928-08-06",
     "deathDate": "1987-02-22"
@@ -1096,7 +1104,8 @@ identity service):
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://coalaip.schema/Identity",
+    "@context": "http://coalaip.schema/",
+    "@type": "Identity",
     "@id": "<URI pointing to this object>",
     "givenName": "Andy",
     "familyName": "Warhol",
@@ -1112,7 +1121,8 @@ On IPLD, we use an empty `@id` to identify an object by its own hash. Thus, we g
 ```javascript
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Identity>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Identity",
     "@id": "",
     "givenName": "Andy",
     "familyName": "Warhol",
@@ -1234,16 +1244,17 @@ JSON-LD, we get:
 // Note: We assume that the data will be put on an immutable ledger and so all links must point
 //       "backwards"
 {
+    "@context": "http://coalaip.schema/",
     "@graph": [
         {
             "@id": "#creation",
-            "@type": "http://coalaip.schema/Creation",
+            "@type": "Creation",
             "name": "Lord of the Rings",
-            "author": "<URI pointing to the author Person>"
+            "author": "<URI pointing to the author Party>"
         },
         {
             "@id": "#digitalManifestation",
-            "@type": "http://coalaip.schema/Manifestation",
+            "@type": "Manifestation",
             "name": "The Fellowship of the Ring",
             "creation": "#creation",
             "digital_work": "<URI pointing to file>",
@@ -1255,7 +1266,7 @@ JSON-LD, we get:
         },
         {
             "@id": "#physicalManifestation",
-            "@type": "http://coalaip.schema/Manifestation",
+            "@type": "Manifestation",
             "name": "The Fellowship of the Ring",
             "creation": "#creation",
             "datePublished": "29-07-1954",
@@ -1273,14 +1284,16 @@ linked with hashes:
 ```javascript
 // A Creation object in IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Creation (can be any subtype of CreativeWork)>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Creation",
     "name": "Lord of the Rings",
-    "author": { "/": "<hash pointing to the author Person>" }
+    "author": { "/": "<hash pointing to the author Party>" }
 }
 
 // A a digital Manifestation of the Creation in IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Manifestation>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Manifestation",
     "name": "The Fellowship of the Ring",
     "creation": { "/": "<hash pointing to the Creation>" },
     "digital_work": { "/": "<hash pointing to a file on e.g. IPFS>" },
@@ -1288,16 +1301,17 @@ linked with hashes:
         "Qmbs2DxMBraF3U8F7vLAarGmZaSFry3vVY5zytuN3BxwaY",
         "<multihash/fingerprint value>"
     ],
-    "locationCreated": { "/": "<URI pointing to a Place>" }
+    "locationCreated": { "/": "<hash pointing to a Place>" }
 }
 
 // A a physical Manifestation of the Creation in IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Manifestation>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Manifestation",
     "name": "The Fellowship of the Ring",
     "creation": { "/": "<hash pointing to the Creation>" },
     "datePublished": "29-07-1954",
-    "locationCreated": { "/": "<URI pointing to a Place>" }
+    "locationCreated": { "/": "<hash pointing to a Place>" }
 }
 ```
 
@@ -1429,7 +1443,8 @@ such containers, so we propose the following to satisfy the consolidated require
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://coalaip.schema/Right",
+    "@context": "http://coalaip.schema/",
+    "@type": "Right",
     "@id": "<URI pointing to this object>",
     "usages": "all|copy|play|stream|...",
     "territory": "<URI pointing to a Place>",
@@ -1437,9 +1452,15 @@ such containers, so we propose the following to satisfy the consolidated require
     "exclusive": true|false,
     "numberOfUses: "1, 2, 3, ...",
     "share": "1, 2, 3, ..., 100",
-    "validFrom": { "@type": "http://schema.org/Date" },
-    "validTo": { "@type": "http://schema.org/Date" },
-    "manifestation": "<URI pointing to the Manifestation object>",
+    "validFrom": {
+        "@type": "Date",
+        "@value": "2016-01-01"
+    },
+    "validTo": {
+        "@type": "Date",
+        "@value": "2017-01-01"
+    },
+    "manifestation": "<URI pointing to a Manifestation>",
     "license": "<URI pointing to a license on an immutable ledger>"
 }
 ```
@@ -1454,17 +1475,24 @@ is favoured:
 ```javascript
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Right>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Right",
     "usages": "all|copy|play|stream|...",
     "territory": { "/": "<hash pointing to a Place>" },
     "context": "inflight|inpublic|commercialuse...",
     "exclusive": true|false,
     "numberOfUses: "1, 2, 3, ...",
     "share": "1, 2, 3, ..., 100",
-    "validFrom": { "/": "<hash pointing to RDF-Schema of Date" },
-    "validTo": { "/": "<hash pointing to RDF-Schema of Date" },
-    "manifestation": { "/": "<hash pointing to the a Manifestation>" },
-    "license": { "/": "<hash pointing to the license>" }
+    "validFrom": {
+        "@type": "Date",
+        "@value": "2016-01-01"
+    },
+    "validTo": {
+        "@type": "Date",
+        "@value": "2017-01-01"
+    },
+    "manifestation": { "/": "<hash pointing to a Manifestation>" },
+    "license": { "/": "<hash pointing to a license>" }
 }
 ```
 
@@ -1537,7 +1565,8 @@ information about the `RightAssignment`'s status:
 ```javascript
 // In JSON-LD
 {
-    "@type": "http://coalaip.schema/Transfer(Payload?)",
+    "@context": "http://coalaip.schema/",
+    "@type": "Transfer",
     "contract": "<URI pointing to a contract on a ledger>"
 }
 ```
@@ -1548,7 +1577,8 @@ and in IPLD:
 ```javascript
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Transfer(Payload?)>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Transfer",
     "contract": { "/": "<hash pointing to a contract>" }
 }
 ```
@@ -1631,23 +1661,24 @@ FIXME:
 ```javascript
 // In IPLD
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Assertion>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Assertion",
     "truth": "false",
     "asserter": { "/": "<hash pointing to a Party>" },
     "subject": {
-        "/": "<IPLD hash pointing to Creation: The Scream's author property>"
-        // e.g. /ipdb/<hash_of_creation>/author
+        "/": "<hash pointing to Creation: The Scream's author property>" // e.g. /ipdb/<hash_of_creation>/author
     }
 }
 
 // and
 
 {
-    "@type": { "/": "<hash pointing to RDF-Schema of Assertion>" },
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Assertion",
     "truth": "true",
     "asserter": { "/": "<hash pointing to a Party>" },
     "subject": {
-        "/": "<IPLD hash pointing to Creation: 32 Campbell's Soup Cans's author property>"
+        "/": "<hash pointing to Creation: 32 Campbell's Soup Cans's author property>"
     }
 }
 ```
