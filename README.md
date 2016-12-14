@@ -416,7 +416,7 @@ The result, termed as ["Expanded Document Form"](https://www.w3.org/TR/json-ld/#
 is an automatically mapped set of data that uses an already available schema where each key points
 to the predicate node of an RDF triplet. Using this form, the parser can easily traverse the
 document and validate each of ocurrence of `@value`, as leaf nodes are only allowed to define the
-most basic types (e.g. string, boolean, integer, etc).
+most basic types (e.g. string, boolean, integer, etc.).
 
 As the rest of this document relies heavily on JSON-LD, we encourage you to learn more by reviewing
 the **Sources** below.
@@ -449,7 +449,7 @@ Microdata, and [JSON-LD](#json-linked-data).
 Schema.org includes the following *core* schemata that are closely related to LCC RRM's entity
 types:
 
-- [schema.org/Place](http://schema.org/Place): [LCC RRM `Place`](#the-rrm-placeentity)
+- [schema.org/Place](http://schema.org/Place): [LCC RRM `Place`](#the-rrm-place-entity)
 - [schema.org/Person](http://schema.org/Person): [LCC RRM `Party`](#the-rrm-party-entity)
 - [schema.org/Organization](http://schema.org/Organization): [LCC RRM `Party`](#the-rrm-party-entity)
   (A `Person` can be a member of an `Organization`)
@@ -702,7 +702,7 @@ to Unix paths or accessing properties in nested objects. To link across network 
 use [multiaddr](https://github.com/jbenet/multiaddr) to construct resource paths across protocols.
 Such links would allow an IPLD object to maintain resolvable links even if those links point to
 separate ledgers (e.g. [IPFS](https://ipfs.io/), [BigchainDB](https://www.bigchaindb.com/),
-[Ethereum](https://www.ethereum.org/), [Bitcoin](https://bitcoin.org/en/), etc).
+[Ethereum](https://www.ethereum.org/), [Bitcoin](https://bitcoin.org/en/), etc.).
 
 
 #### Evaluation of IPLD
@@ -720,7 +720,7 @@ cavets:
       data structure;
     - Future-proofs underlying concepts ([multi-x](https://github.com/multiformats));
     - Enables wide compatibility, even down to the UNIX file system path; and
-    - Deserializes to a multitude of other data serialization formats (YAML, JSON, etc).
+    - Deserializes to a multitude of other data serialization formats (YAML, JSON, etc.).
 - **Caveats:**
     - Non-standardized protocols ([multi-x](https://github.com/multiformats));
         - [Overlaps](https://interledger.org/five-bells-condition/spec.html#crypto-conditions-type-registry)
@@ -1211,24 +1211,8 @@ of individuals. Using the minimum number of properties listed in the RRM, an `lc
 
 - TODO: This needs a lot of speccing out. How can members of an organization collectively sign
   something they're submitting? Is there a single public key address assigned to an organization or
-does the organization just bundle members that act like they were in an organization but act
-independently?
-
-
-##### Allowing `Party`s to Sign Metadata
-
-FIXME:
-As we envision future identity registries built on top of public ledgers, we need to ensure
-that users are able to include a cryptographic identity with any registered identities, allowing
-them to sign any submitted metadata. Luckily, the [Friend of a Friend Project](http://www.foaf-project.org/)
-has already thought about this and provide the [Web of Trust RDF ontology](http://xmlns.com/wot/0.1/)
-for signing RDF documents with public-key cryptography. Integrating this ontology into our identity
-model, we could get something like:
-
-- TODO:
-    - Give an code example how WOT could look like in an immutable ledger.
-    - Make sure that the *immutability* is not violated, the WOT ontology as of now only work with
-      mutability.
+  does the organization just bundle members that act like they were in an organization but act
+  independently?
 
 
 ### The RRM `Creation` Entity
@@ -1347,6 +1331,14 @@ Note that a distinction has been made between `Work`s (typed as "coalaip.schema/
 manifestations can be represented, with digital manifestations containing a link to an example of
 the work as well as possibly being associated with a set of fingerprints.
 
+#### The Abstract Notion of `Work`s
+
+One can view a `Work` as the overarching creative concept that is brought to existence by a number
+of perceivable `Manifestations`. It is meant as an abstraction to connect a group of related
+`Manifestation`s together. As such, we argue that empty `Work`s–those not linked to from any
+`Manifestation`s–do not make much sense and recommend implementations to register `Work`s with their
+initial `Manifestation`s.
+
 
 ### The RRM `Right` Entity
 
@@ -1354,7 +1346,7 @@ In comparison to all other RRM entity types, the `Right` is by far the most inte
 minimal set of required properties include:
 
 - **RightType:** Defines the type of `Right` (e.g. all uses, license, copy, play, stream,
-  administration, an `lcc:RightSet`, etc);
+  administration, an `lcc:RightSet`, etc.);
 - **ToolType:** Defines the type of medium that must be employed when exercising the `Right` (e.g.
   only watch on mobile phone or only use a brush to produce manifestations). `ToolType`s are not
   consumed as part of exercising the `Right`;
@@ -1395,71 +1387,41 @@ Visualized, an RRM `Right` looks like:
 ![](media/rrmright.png)
 
 
-##### Additional Types of `Right`s
+#### Additional Types of `Right`s
 
-FIXME:
-The RRM specifies three special types of `Right`s intended for specific use
-cases:
+The RRM specifies three special types of `Right`s intended for specific use cases:
 
-- `lcc:SourceRight`: A `Right` from which another `Right` is derived;
+- `lcc:SourceRight`: A `Right` from which another `Right` is allowed by or created from;
 - `lcc:SupersededRight`: A `Right` to invalidate a referenced `Right`; and
 - `lcc:RightSet`: A collection of `Right`s bundled as a single `Right`.
 
 
-For now, we've decided to leave these special types out of the specification:
+We utilize `lcc:SourceRight`s in our notion of [`Copyright`s](#copyright-semantics) as well as our
+`Right` transformation, but, for now, we leave the other types out of the specification:
 
-- `lcc:SourceRight` and `lcc:SupersededRight`: Although both can be easily represented with an
-  ontology, they would greatly complicate the ownership logic of an immutable ledger.
-- `lcc:RightSet`: In the context of putting `Right`s onto a global registry, this is specifically a
-  problem: most decentralized ledgers cannot guarantee, and especially synchronize, the concurrent
-  transfer of multiple assets.
-    - TODO: This may eventually become possible with cryptoconditions
-
-
-##### The Notion of Ownership
-
-FIXME:
-As RRM `Right`s are specific to the RRM `Party` they're provided for, any digital creator that wants
-to distribute a `Manifestation`'s `Right`s to a multitude of interested `Party`s must take the
-following steps:
-
-1. Register their `Party` identifier on a global registry;
-1. Register their `Creation` on a global registry and link it to their `Party` identifier;
-1. Register `Manifestation`s to the `Creation` on a global registry;
-1. Register any number of `Right`s tailored to interested `Party`s on a global registry; and
-1. Register `RightAssignment`s to assign these `Right`s to interested `Party`s.
-
-
-This highlights that `Right`s are not strictly limited to only registrations. `Right`s contain
-properties of ownership and can be transferred from one `Party` to another via `RightsAssignment`s.
-
-`Manifestation`s are not limited to a single `Right`. `Party`s are able to attach as many `Right`s
-as necessary to a `Manifestation`. There are a few edge cases to consider when licensing information
-is stored:
-
-- Specific licenses can imply an agreement between the issuer of the `Right` and the commons; to
-  handle this intention to grant `Right`s to literally everyone, a special `Party` symbolizing the
-  commons could be created to receive and hold such `Right`s. Following the assignment of this
-  `Right`, other, arbitrary, transfers of `Right`s of the license to specific Persons or must be
-  disallowed. Finally, `Party`s must also be disallowed from attaching new `Right`s with licenses
-  that conflict with the "commons license" to the `Manifestation`.
-- TODO: Maybe there are more edge cases like this. If so, enumerate and discuss/propose solutions.
+- `lcc:SupersededRight`: Although representable, reversible rights complicate the ownership logic of
+  an immutable ledger; and
+- `lcc:RightSet`: In the context of putting `Right`s onto a global distributed ledger, bundling
+  multiple rights together presents a specific problem: most decentralized ledgers cannot guarantee,
+  and especially synchronize, the concurrent transfer of multiple assets (in the future, this may be
+  possible with cryptoconditions).
 
 
 #### Proposed Transformation
 
-FIXME:
 Transforming the RRM `Right` entity poses some challenges. According to the RRM specification, a
 `Right` can:
 
 - Represent both copyright as well as licensing information; and
-- Be a `lcc:SourceRight`, `lcc:SuperSeededRight` or `lcc:RightSet.`
+- Be a `lcc:SourceRight`, `lcc:SuperSeededRight` or `lcc:RightSet`.
 
 
-In order for `Right`s to be atomically transferrable units, we ignore the special requirements of
-the `lcc:RightSet` and focus on modelling `Right`s to be transferrable containers of specific
-licensing information. To the best of our knowledge, there are no existing RDF schemata for creating
-such containers, so we propose the following to satisfy the consolidated requirements of:
+For the purposes of storing `Right`s on decentralized ledgers, we ignore the requirements of the
+`lcc:RightSet` and model `Right`s as atomically transferrable containers of licensing information.
+To make a distinction between derived licensing information and a full copyright, we separately
+[explore the semantics of copyright later](#copyright-semantics). To the best of our knowledge,
+there are no existing RDF schemata for creating such containers, so we propose the following to
+satisfy the consolidated requirements of:
 
 - [LCC: Rights Reference Model](http://doi.org/10.1000/284);
 - [W3C: Open Digital Rights Language](https://www.w3.org/TR/odrl/); and
@@ -1486,7 +1448,7 @@ such containers, so we propose the following to satisfy the consolidated require
         "@type": "Date",
         "@value": "2017-01-01"
     },
-    "manifestation": "<URI pointing to a Manifestation>",
+    "source": "<URI pointing to a Copyright>",
     "license": "<URI pointing to a license on an immutable ledger>"
 }
 ```
@@ -1517,26 +1479,124 @@ is favoured:
         "@type": "Date",
         "@value": "2017-01-01"
     },
-    "manifestation": { "/": "<hash pointing to a Manifestation>" },
+    "source": { "/": "<hash pointing to a Copyright>" },
     "license": { "/": "<hash pointing to a license>" }
 }
 ```
 
+In our transformation, it is important to highlight that every `Right` must include a "source" (or
+equivalent) property. In designing for use on an immutable ledger, the "source" property implements
+support for `lcc:SourceRight`s, albeit in a "backwards" relation to the RRM's definition: a `Right`
+containing a `source` property is the derivation while the pointed-to entity is the
+`lcc:SourceRight`. Because of this restriction, new `Right`s may only be created if have been
+allowed by an earlier `Right` or [`Copyright`](#copyright-semantics).
 
-[RRM `Right`s can be linked to `Party`s through cryptographic ownership](#the-notion-of-ownership).
-Only the individuals or organizations with access to the underlying `Right` entity on a ledger are
-able to repurpose the `Right` by, for example, initiating a `RightsAssignment` to a another `Party.`
-Ownership transactions (i.e. RRM `RightsAssignment`s) of every form (e.g. transfers, loans
-consignments, etc.) must be stored in an ordered fashion to maintain the chain of provenance for
-each right.
+#### Copyright Semantics
+
+Although RRM `Right`s are capable of representing both full copyrights as well as derived licenses
+to `Creation`s, we split these two concepts into different entities to better represent them within
+distributed ledgers. We base the structure of the `Copyright` entity on the `Right` entity's, but as
+only a subset of the `Right`'s properties pertain to `Copyright`s (e.g. "territory", "validFrom",
+etc.), we do not require implementations to subtype `Copyright`s from `Right`s. However,
+semantically, and for the purposes of discussion, we treat `Copyright`s as a subtype of `Right`s.
+Similarly to `Right`s, we propose that `Copyright`s be stored on decentralized ledgers for
+maintaining ownership and provenance.
+
+We propose:
+
+```javascript
+// In JSON-LD
+{
+    "@context": "http://coalaip.schema/",
+    "@type": "Copyright",
+    "rightsOf": "<URI pointing to a Creation (usually a Manifestation)>",
+    "territory": "<URI pointing to a Place>",
+    "validFrom": {
+        "@type": "Date",
+        "@value": "2016-01-01"
+    },
+    "validTo": {
+        "@type": "Date",
+        "@value": "2017-01-01"
+    }
+}
+
+// In IPLD
+{
+    "@context": { "/": "<hash pointing to coalaip.schema's context>" },
+    "@type": "Copyright",
+    "rightsOf": { "/": "<hash pointing to a Creation (usually a Manifestation)>" },
+    "territory": { "/": "<hash pointing to a Place>" },
+    "validFrom": {
+        "@type": "Date",
+        "@value": "2016-01-01"
+    },
+    "validTo": {
+        "@type": "Date",
+        "@value": "2017-01-01"
+    }
+}
+
+For implementations, we recommend that `Copyright`s be automatically registered with their
+`Manifestation`s so as to immediately state the `Manifestation`'s copyright holder and allow other
+`Right`s to be derived from the `Copyright`. Given that multiple `Copyright`s may be needed, e.g.
+for multiple regions, there is no limit to the number of `Copyright`s that can be attached to a
+given `Manifestation` (for potential conflicts, see [`Assertion`s](#the-rrm-assertion-entity) and
+[`RightsConflict`s](#the-rrm-rightsconflict-entity).
+
+#### The Notion of Ownership
+
+Given that `Right`s and `Copyright`s are designed to be stored on decentralized ledgers, we propose
+to link these entities with their related rightsholding `Party`s by cryptographic ownership.
+Assuming the ledger natively supports cryptographic ownership of assets, this results in only the
+owners of a `Right` or `Copyright` on the ledger to be maintained as the rightsholders. Moreover,
+this means that only these owners are able to repurpose the `Right` by, for example, initiating a
+[`RightsAssignment`](#the-rrm-rightsassignment) to a another `Party`. Ledgers should be chosen so
+that all forms (e.g. transfers, loans consignments, etc.) of these transactions (i.e. RRM
+`RightsAssignment`s) can be stored in an ordered fashion to maintain each right's chain of
+provenance.
+
+With RRM `Right`s modelled in such a fashion, any digital creator that wants to register and
+distribute the `Right`s of a `Manifestation` to interested `Party`s must:
+
+1. Register their `Party` identifier on a global registry;
+1. Register their `Creation` on a global registry and link it to their `Party` identifier;
+1. Register `Manifestation`s to the `Creation` on a global registry;
+1. Register a `Copyright` for the `Manifestation` on a global registry;
+1. Derive any number of `Right`s tailored to interested `Party`s from the `Copyright` and register
+   them on a global registry; and
+1. Register `RightAssignment`s to assign these `Right`s to interested `Party`s.
+
+
+The above steps highlight how a `Right` is not only limited to registration; with the use of a
+ledger, `Right`s also contain properties of ownership and can be transferred from one `Party` to
+another via `RightsAssignment`s. The owner of a `Right` or `Copyright` on the ledger is maintained
+to be the rightsholder.
+
+However, there are a few edge cases to consider when licensing information is stored this way:
+
+- Specific licenses can imply an agreement between the issuer of the `Right` and the commons; to
+  handle this intention to grant `Right`s to literally everyone, a special `Party` symbolizing the
+  commons could be created to receive and hold such `Right`s. Following the assignment of this
+  `Right`, other, arbitrary, transfers of `Right`s of the license to specific `Party`s must be
+  disallowed. Finally, `Party`s must also be disallowed from attaching new `Right`s with licenses
+  that conflict with the "commons license" to the `Manifestation`.
+- TODO: Maybe there are more edge cases like this. If so, enumerate and discuss/propose solutions.
+
+
+It is important to note that with these ownership semantics for copyrights and licenses, the
+ownership of a `Work` or `Manifestation` is essentially meaningless: these entities simply contain
+information about a creative work and are used as pointers for `Copyright`s and `Right`s. As such,
+storing `Work`s and `Manifestation`s in ledgers is unnecessary and an immutable data store, e.g.
+IPFS, can be used instead if cross-protocol links are supported (i.e. multiaddr).
 
 
 ### The RRM `RightsAssignment` Entity
 
 According to the RRM, a `RightsAssignment` describes an event that results in the existence or
-non-existence of a `Right.` Depending on the type, a `RightsAssignment` may be linked from an
-assigning `Party` ("Assigner") to a receiving `Party` ("Assignee"). From the RRM, a
-`RightsAssignment` can have the following properties:
+non-existence of a `Right` (or `Copyright`). Depending on the type, a `RightsAssignment` may
+be linked from an assigning `Party` ("Assigner") to a receiving `Party` ("Assignee"). From the RRM,
+a `RightsAssignment` can have the following properties:
 
 - **RightsAssignmentType**: Defines the type of `RightsAssignment`; one of:
     - **RightsLaw:** Represents the creation of a `Right` by law (e.g. the US Copyright Act of 1976);
@@ -1566,11 +1626,10 @@ Visualized, an RRM `RightsAssignment` looks like:
 
 #### Proposed Transformation
 
-FIXME:
 Based on our expectation that `Right`s will be registered to immutable ledgers, we expect the
 following requirements to be met by every ledger capable of transferring `Right`s:
 
-- Assets must only be transferrable if cryptographic key-pair signatures are used on the transaction
+- Assets are only transferrable if cryptographic key-pair signatures are used on the transaction
   level;
 - Asset transactions must be able to contain a JSON-serializable payload;
 - Assets' provenance chains must be easily comprehensible for any user;
@@ -1578,21 +1637,23 @@ following requirements to be met by every ledger capable of transferring `Right`
 - Transactions must support IPLD as well as [Crypto-Conditions](https://interledger.org/five-bells-condition/spec.html);
 - Transfer transactions must support different modes, including:
     - Transfers from a group of individuals to a single individual (and vice-versa);
-    - Transfers that are only claimable during a certain time span (timelock conditions); and
+    - Transfers that are only claimable during a certain time span ("timelock conditions"); and
     - Transfers that are only claimable by an individual or group that knows a certain secret key
-      (hashlock conditions);
+      ("hashlock conditions");
 
 
-With these assumptions, we can model a minimally transformed RRM `RightsAssignment` to be part of a
-transfer-transaction's payload on a ledger, and automatically include links to related `Party`s and
-information about the `RightAssignment`'s status:
+With these assumptions, we can model a minimally transformed RRM `RightsAssignment` on top of
+[schema.org/TransferAction](http://schema.org/TransferAction) and include it as the payload of a
+ledger's transfer-transaction. Piggybacking on a transfer-transaction allows the rights transfer to
+automatically be included with information such as the current and new rightsholders, time of
+execution, and status of execution (valid or rejected by the ledger).
 
 
 ```javascript
 // In JSON-LD
 {
     "@context": "http://coalaip.schema/",
-    "@type": "Transfer",
+    "@type": "RightsAssignment",
     "contract": "<URI pointing to a contract on a ledger>"
 }
 ```
@@ -1604,16 +1665,16 @@ and in IPLD:
 // In IPLD
 {
     "@context": { "/": "<hash pointing to coalaip.schema's context>" },
-    "@type": "Transfer",
+    "@type": "RightsAssignment",
     "contract": { "/": "<hash pointing to a contract>" }
 }
 ```
 
 
-Although not required, we include the `contract` property in this schema to frame the rights that
-are available to be transferred. A `Party` is not able to transfer more `Right`s than they have
-themselves, so a transfer of `Right`s can only contain permissions that are a subset of the `Right`s
-contained in the original creation of the `Right` or previous transfer-transaction.
+Although not required, we include the `contract` property to allow a `RightsAssignment` to more
+specifically frame the transferred rights (e.g. with additional clauses). A `Party` can only
+transfer the `Right`s they own, so a transfer of `Right`s will contain only the permissions that are
+available in the original `Right` or previous transfer-transactions.
 
 
 ### The RRM `Assertion` Entity
@@ -1644,7 +1705,7 @@ Additionally, an RRM `Assertion` can have the following outgoing references:
 - Links to `RightsConflict`s (`0 - n`; one-to-many): *SubjectOfAssertion*
 
 
-*Note: Differing slightly from the RRM, we have added `Creation`s as possible a SubjectOfAssertion.
+*Note: Differing slightly from the RRM, we have added `Creation`s as a possible SubjectOfAssertion.
 The `Context` entity has also been expanded into its subclasses: `Right`s, `RightsAssignment`s,
 `Assertion`s, and `RightsConflict`s.*
 
@@ -1668,7 +1729,7 @@ Think about the following scenario:
   really good with computers—they were never really his type of medium—he also accidentally
   registers a `Creation` of Edvard Munch's "The Scream" under his name.
 
-Visually, this is what we'd end up with:
+Visually, this is what's been registered:
 
 
 ![](media/lccrrmassertionexample1.png)
@@ -1677,23 +1738,43 @@ Visually, this is what we'd end up with:
 This creates an awkward situation: we've stored our ontology on a blockchain that supports IPLD and
 content-addressed storage, so, in contrast to a traditional SQL database, we can't correct the
 mistaken transactions by simply reverting them. The only action we can take is to append more
-information to the blockchain–we can validate the truthiness of a specific statements by appending
+information to the blockchain–we can validate the truthiness of specific statements by appending
 `Assertion`s.
 
-FIXME:
 `Assertion`s are applied towards entire entities and evaluate whether an asserting `Party`
-("Asserter") agrees or disagrees with the claim made by the entity.
+("Asserter") agrees or disagrees with the claim made by the entity. Schema.org's [ReviewAction](http://schema.org/ReviewAction)
+provides a good base to work off of, albeit with less-than-ideal property names that don't map well
+to the RRM's definitions. We assume that "coala.schema" will alias some of these properties and get:
 
 ```javascript
+// In JSON-LD
+{
+    "@context": "http://coalaip.schema/",
+    "@type": "Assertion",
+    "asserter": "<URI pointing to a Party>",
+    "assertionTruth": false,
+    "assertionSubject": "<URI pointing to Creation: The Scream>",
+    "error": "author"
+}
+
+// and
+
+{
+    "@context": "http://coalaip.schema/",
+    "@type": "Assertion",
+    "asserter": "<URI pointing to a Party>",
+    "assertionTruth": true,
+    "assertionSubject": "<URI pointing to Creation: 32 Campbell's Soup Cans>"
+}
+
 // In IPLD
 {
     "@context": { "/": "<hash pointing to coalaip.schema's context>" },
     "@type": "Assertion",
-    "truth": "false",
-    "asserter": { "/": "<hash pointing to a Party>" },
-    "subject": {
-        "/": "<hash pointing to Creation: The Scream's author property>" // e.g. /ipdb/<hash_of_creation>/author
-    }
+    "asserter": { "/": "<hash pointing to a Party" },
+    "assertionTruth": false,
+    "assertionSubject": { "/": "<hash pointing to Creation: The Scream>" },
+    "error": "author"
 }
 
 // and
@@ -1701,23 +1782,37 @@ FIXME:
 {
     "@context": { "/": "<hash pointing to coalaip.schema's context>" },
     "@type": "Assertion",
-    "truth": "true",
-    "asserter": { "/": "<hash pointing to a Party>" },
-    "subject": {
-        "/": "<hash pointing to Creation: 32 Campbell's Soup Cans's author property>"
-    }
+    "asserter": { "/": "<hash pointing to a Party" },
+    "assertionTruth": true,
+    "assertionSubject": { "/": "<hash pointing to Creation: 32 Campbell's Soup Cans>" }
 }
 ```
 
+*Note: On IPLD, you have the option of applying additional granularity to the `Assertion` by
+directly referring to an entity's property as the "assertionSubject". For example, if you wanted to
+assert that "The Scream"'s "author" property is incorrect, you could do so with*
+
+```javascript
+{
+    ...
+    "assertionTruth": "false",
+    "assertionSubject": { "/": "/ipdb/<hash_of_creation>/author" },
+    "error": "...",
+    ...
+}
+```
+
+*Although this doesn't directly apply the `Assertion` against the entire `Creation` entity, we still
+have a link to the `Creation` in the IPLD hash and can associate this `Assertion` to it.*
 
 We end up with the following:
 
 ![](media/lccrrmassertionexample2.png)
 
 
-Finally, we add that using IPLD with `Assertion`s is ideal, as it enforces the immutability of an
-object after being asserted against. With IPLD, objects cannot be silently changed after-the-fact as
-any changes will cause their IPLD hashes to also change.
+As a recommendation, we add that using IPLD with `Assertion`s is ideal, as it enforces the
+immutability of an asserted object (as well as the assertion itself); with IPLD, objects cannot be
+silently changed after-the-fact as any changes will cause their IPLD hashes to also change.
 
 
 ### The RRM `RightsConflict` Entity
@@ -1730,6 +1825,28 @@ TODO:
 
 TODO:
     - See other introductory sections of LCC entities. Use same structure to do the transformation
+
+
+### Generating Verifiable Claims
+
+As the COALA IP ontology may be potentially exposed to the public, users must have a mechanism of
+proving their actions to others. To provide this with cryptographic signatures is a two part
+challenge: we not only need to ensure that user identities can be associated with cryptographic
+identities (see [requirements of `Party`s](#transformation-of-rrm-party-to-an-rdf-person), but also
+that any submitted claim can be signed by those cryptographic identities. Although no optimal
+solution currently exists for associating identities, a number of pre-existing schemata are
+available for signing RDF-compatible data:
+
+- The [Web of Trust RDF ontology](http://xmlns.com/wot/0.1/) by the [Friend of a Friend Project](http://www.foaf-project.org/),
+  although this assumes the ontology is mutable; and
+- The [Linked Data Signatures schema](https://web-payments.org/specs/source/ld-signatures/) by the
+  [Web Payments Community Group](https://www.w3.org/community/webpayments/)
+
+Building on top of these two facets is the [Verifiable Claims Architecture](http://w3c.github.io/webpayments-ig/VCTF/architecture/)
+and its associated [data model](http://opencreds.org/specs/source/claims-data-model/) (currently
+using the Linked Data Signatures schema) that is being standardized by the [Verifiable Claims Task
+Force](http://w3c.github.io/vctf/). In the future, data from COALA IP could be used to generate, or
+even be created, in the format proposed.
 
 
 ### User Extensions
